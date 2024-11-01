@@ -7,147 +7,77 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             background-color: #121212;
             color: #e0e0e0;
-            text-align: center;
-            margin: 0; /* Remove default body margin for full-screen effect */
         }
         #tabs {
             display: flex;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            background-color: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 4px;
-            margin: 0 5px;
-            transition: background-color 0.3s;
-        }
-        .tab:hover {
-            background-color: #3a4a66;
-        }
-        .tab.active {
+        .tab-button {
             background-color: #3a4a66;
             color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 0 5px;
+            border-radius: 4px;
         }
-        .tab-content {
+        .tab-button:hover {
+            background-color: #2e3d57;
+        }
+        #content {
             display: none;
-            border: 1px solid #333;
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 100%; /* Allow the iframe to stretch */
-            margin: 0 auto;
-            height: calc(100vh - 100px); /* Fullscreen height minus tabs */
+            width: 100%;
+            height: calc(100vh - 50px); /* Full height minus tab height */
+            border: none;
         }
-        .active-content {
+        #chat-tab, #humanizer-tab, #embed-tab {
+            display: none;
+        }
+        .active {
             display: block;
         }
         #password-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 20px;
+            justify-content: center;
+            height: 100vh;
         }
-        #password-input {
-            padding: 10px;
+        #chat-container, #humanizer-container {
+            display: none;
             width: 100%;
-            background-color: #333333;
-            color: #e0e0e0;
-            border: 1px solid #555;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        #submit-password {
-            padding: 10px 20px;
-            border: none;
-            background-color: #3a4a66;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        #chat-box {
-            max-height: 400px;
-            overflow-y: auto;
-            padding: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
             border: 1px solid #333;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            background-color: #1b1b1b;
-            display: flex;
-            flex-direction: column;
-        }
-        .message {
-            padding: 8px 12px;
-            margin: 5px 0;
-            border-radius: 6px;
-            display: inline-block;
-            max-width: 70%;
-            word-wrap: break-word;
-        }
-        .user-message {
-            background-color: #3a4a66;
-            color: #e0f7fa;
-            align-self: flex-end;
-            text-align: right;
-        }
-        .ai-response {
-            background-color: #333333;
-            color: #e0e0e0;
-            align-self: flex-start;
-            text-align: left;
-        }
-        #input-container {
-            display: flex;
-            align-items: center;
-        }
-        #user-input, #input-text {
-            flex: 1;
-            padding: 10px;
-            background-color: #333333;
-            color: #e0e0e0;
-            border: 1px solid #555;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-        #send-button, #humanize-button {
-            padding: 10px 20px;
-            border: none;
-            background-color: #3a4a66;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        #send-button:hover, #humanize-button:hover {
-            background-color: #2e3d57;
-        }
-        #embed-container {
-            width: 100%;
-            height: 100%; /* Make the iframe take the full height of the container */
-            border: none; /* Remove default iframe border */
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
 <body>
 
 <div id="password-container">
+    <h1>Enter Password</h1>
     <input type="password" id="password-input" placeholder="Enter password..." />
     <button id="submit-password">Submit</button>
 </div>
 
-<div id="tabs" style="display: none;">
-    <div class="tab active" onclick="showTab('chat')">AI Chat Interface</div>
-    <div class="tab" onclick="showTab('humanizer')">Humanizer Tool</div>
-    <div class="tab" onclick="showTab('embed')">Embedded Website</div> <!-- New Tab -->
+<div id="tabs">
+    <button class="tab-button" id="chat-button">AI Chat Interface</button>
+    <button class="tab-button" id="humanizer-button">AI Humanizer Tool</button>
+    <button class="tab-button" id="embed-button">Embedded Website</button>
 </div>
 
-<div id="chat-container" class="tab-content active-content" style="display: none;">
+<div id="chat-container" class="content">
     <div id="chat-box">
-        <!-- AI responses and user messages will appear here -->
+        <!-- Chat messages will appear here -->
     </div>
     <div id="input-container">
         <input type="text" id="user-input" placeholder="Type your message..." />
@@ -155,55 +85,54 @@
     </div>
 </div>
 
-<div id="humanizer-container" class="tab-content" style="display: none;">
-    <textarea id="input-text" placeholder="Enter text to humanize..." rows="5"></textarea>
+<div id="humanizer-container" class="content">
+    <textarea id="input-text" placeholder="Enter text to humanize..."></textarea>
     <button id="humanize-button">Humanize</button>
 </div>
 
-<div id="embed-container" class="tab-content" style="display: none;">
-    <iframe id="embed-frame" src="https://sd592g.github.io/zj684od4lfg/" class="embed-container"></iframe>
-</div>
+<iframe id="embed-iframe" class="content" src="https://sd592g.github.io/zj684od4lfg/" frameborder="0"></iframe>
 
 <script>
     const correctPassword = "hi";
     const passwordInput = document.getElementById('password-input');
     const submitPasswordButton = document.getElementById('submit-password');
     const passwordContainer = document.getElementById('password-container');
-    const tabs = document.getElementById('tabs');
-    const chatContainer = document.getElementById('chat-container');
-    const humanizerContainer = document.getElementById('humanizer-container');
-    const embedContainer = document.getElementById('embed-container');
 
     submitPasswordButton.addEventListener('click', () => {
         if (passwordInput.value === correctPassword) {
             passwordContainer.style.display = 'none';
-            tabs.style.display = 'flex';
-            chatContainer.style.display = 'block'; // Show chat container by default
-            showTab('chat'); // Show the chat tab content by default
+            document.getElementById('tabs').style.display = 'flex';
+            document.getElementById('chat-button').click(); // Automatically open the chat tab
         } else {
             alert("Incorrect password. Please try again.");
         }
     });
 
-    function showTab(tabName) {
-        const tabs = document.querySelectorAll('.tab-content');
-        const tabButtons = document.querySelectorAll('.tab');
-        tabs.forEach(tab => {
-            tab.style.display = 'none'; // Hide all tabs
-            tab.classList.remove('active-content');
-        });
-        tabButtons.forEach(tab => tab.classList.remove('active'));
+    // Tab functionality
+    document.getElementById('chat-button').addEventListener('click', () => {
+        showTab('chat-container');
+    });
 
-        document.getElementById(tabName + '-container').style.display = 'block'; // Show selected tab
-        document.getElementById(tabName + '-container').classList.add('active-content');
-        document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+    document.getElementById('humanizer-button').addEventListener('click', () => {
+        showTab('humanizer-container');
+    });
+
+    document.getElementById('embed-button').addEventListener('click', () => {
+        showTab('embed-iframe');
+    });
+
+    function showTab(tabId) {
+        document.querySelectorAll('.content').forEach((tab) => {
+            tab.style.display = 'none';
+        });
+        document.getElementById(tabId).style.display = 'block';
     }
 
+    // Chat Interface Code (as in previous example)
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
     const chatBox = document.getElementById('chat-box');
 
-    // Function to display messages in the chat box
     function displayMessage(message, isUser = false) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', isUser ? 'user-message' : 'ai-response');
@@ -212,7 +141,17 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Function to fetch AI response from the API
+    sendButton.addEventListener('click', async () => {
+        const userMessage = userInput.value.trim();
+        if (!userMessage) return;
+        
+        displayMessage(userMessage, true);
+        userInput.value = '';
+
+        const aiResponse = await fetchAIResponse(userMessage);
+        displayMessage(aiResponse);
+    });
+
     async function fetchAIResponse(prompt) {
         const url = `https://tilki.dev/api/hercai?soru=${encodeURIComponent(prompt)}`;
         try {
@@ -225,67 +164,12 @@
         }
     }
 
-    // Event listener for the Send button
-    sendButton.addEventListener('click', async () => {
-        const userMessage = userInput.value.trim();
-        if (!userMessage) return;
-
-        // Display user message
-        displayMessage(userMessage, true);
-
-        // Clear input
-        userInput.value = '';
-
-        // Fetch and display AI response
-        const aiResponse = await fetchAIResponse(userMessage);
-        displayMessage(aiResponse);
-    });
-
-    // Allow Enter key to submit the message
     userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             sendButton.click();
         }
     });
-
-    // Humanize Text Function
-    function humanizeText(text) {
-        const zeroWidthSpace = '\u200B';
-        const inflatedText = text.split('').join(zeroWidthSpace);
-        const lowerCaseText = inflatedText.toLowerCase().replace(/[,;]/g, '');
-        return lowerCaseText;
-    }
-
-    // Event listener for the Humanize button
-    const humanizeButton = document.getElementById('humanize-button');
-    const inputTextArea = document.getElementById('input-text');
-
-    humanizeButton.addEventListener('click', () => {
-        const humanizedText = humanizeText(inputTextArea.value);
-        navigator.clipboard.writeText(humanizedText).then(() => {
-            console.log("Text copied to clipboard:", humanizedText);
-        }).catch(err => {
-            console.error("Error copying text:", err);
-        });
-        inputTextArea.value = '';
-    });
-
-    // Handle paste event in the humanizer input area
-    inputTextArea.addEventListener('paste', (event) => {
-        event.preventDefault();
-        const pasteText = (event.clipboardData || window.clipboardData).getData('text');
-        inputTextArea.value = pasteText;
-
-        setTimeout(() => {
-            const humanizedText = humanizeText(inputTextArea.value);
-            navigator.clipboard.writeText(humanizedText).then(() => {
-                console.log("Text copied to clipboard:", humanizedText);
-            }).catch(err => {
-                console.error("Error copying text:", err);
-            });
-            inputTextArea.value = '';
-        }, 0);
-    });
 </script>
+
 </body>
 </html>
