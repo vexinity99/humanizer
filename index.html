@@ -18,6 +18,7 @@
             display: flex;
             justify-content: center;
             margin-bottom: 10px;
+            display: none; /* Initially hidden */
         }
         .tab-button {
             background-color: #3a4a66;
@@ -134,9 +135,41 @@
             background-color: #555;
             border-radius: 4px;
         }
+        /* Password screen styles */
+        #password-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        #password-input {
+            padding: 10px;
+            background-color: #333333;
+            color: #e0e0e0;
+            border: 1px solid #555;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        #login-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #3a4a66;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        #login-button:hover {
+            background-color: #2e3d57;
+        }
     </style>
 </head>
 <body>
+
+<div id="password-container">
+    <input type="password" id="password-input" placeholder="Enter Password" />
+    <button id="login-button">Login</button>
+</div>
 
 <div id="tabs">
     <button class="tab-button" id="aiChatTab">AI Chat Interface</button>
@@ -166,15 +199,31 @@
 </div>
 
 <script>
+    const passwordInput = document.getElementById('password-input');
+    const loginButton = document.getElementById('login-button');
+    const tabs = document.getElementById('tabs');
+    const content = document.getElementById('content');
     const chatContainer = document.getElementById('chat-container');
     const humanizerContainer = document.getElementById('humanizer-container');
     const embedContainer = document.getElementById('embed-container');
+
+    // Password handling
+    loginButton.addEventListener('click', () => {
+        const password = passwordInput.value;
+        if (password === 'yourPassword') { // Replace 'yourPassword' with your actual password
+            document.getElementById('password-container').style.display = 'none';
+            tabs.style.display = 'flex'; // Show tabs
+            content.style.display = 'block'; // Show content
+            chatContainer.style.display = 'block'; // Show chat interface by default
+        } else {
+            alert('Incorrect password. Please try again.');
+        }
+    });
 
     document.getElementById('aiChatTab').addEventListener('click', () => {
         chatContainer.style.display = 'block';
         humanizerContainer.style.display = 'none';
         embedContainer.style.display = 'none';
-        unlockInterface(); // Unlock the chat interface when switching tabs
     });
 
     document.getElementById('humanizerTab').addEventListener('click', () => {
@@ -215,60 +264,14 @@
     }
 
     sendButton.addEventListener('click', async () => {
-        const userMessage = userInput.value.trim();
-        if (!userMessage) return;
+        const message = userInput.value;
+        if (message.trim() === '') return;
 
-        displayMessage(userMessage, true);
-        userInput.value = '';
+        displayMessage(message, true); // Show user message
+        userInput.value = ''; // Clear input
 
-        const aiResponse = await fetchAIResponse(userMessage);
-        displayMessage(aiResponse);
-    });
-
-    userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendButton.click();
-        }
-    });
-
-    // Humanizer functionality
-    function humanizeText(text) {
-        const zeroWidthSpace = '\u200B';
-        const inflatedText = text.split('').join(zeroWidthSpace);
-        const lowerCaseText = inflatedText.toLowerCase();
-        const cleanText = lowerCaseText.replace(/[,;]/g, '');
-        return cleanText;
-    }
-
-    const humanizeButton = document.getElementById('humanize-button');
-    const inputTextArea = document.getElementById('input-text');
-
-    humanizeButton.addEventListener('click', () => {
-        const inputText = inputTextArea.value.trim();
-        if (!inputText) return;
-
-        const humanizedText = humanizeText(inputText);
-        navigator.clipboard.writeText(humanizedText).then(() => {
-            console.log("Text copied to clipboard:", humanizedText);
-        }).catch(err => {
-            console.error("Error copying text:", err);
-        });
-
-        inputTextArea.value = '';
-    });
-
-    inputTextArea.addEventListener('paste', (event) => {
-        setTimeout(() => {
-            const pastedText = inputTextArea.value.trim();
-            if (pastedText) {
-                const humanizedText = humanizeText(pastedText);
-                navigator.clipboard.writeText(humanizedText).then(() => {
-                    console.log("Pasted text copied to clipboard:", humanizedText);
-                }).catch(err => {
-                    console.error("Error copying text:", err);
-                });
-            }
-        }, 0);
+        const aiResponse = await fetchAIResponse(message);
+        displayMessage(aiResponse); // Show AI response
     });
 
     // Unlock the chat interface function
