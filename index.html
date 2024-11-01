@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Humanizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            text-align: center;
+        }
+        #password-header {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        #password-container, #humanizer-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            border: 1px solid #333;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        #password-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #password-input {
+            padding: 10px;
+            width: 100%;
+            background-color: #333333;
+            color: #e0e0e0;
+            border: 1px solid #555;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        #submit-password {
+            padding: 10px 20px;
+            border: none;
+            background-color: #3a4a66;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        #submit-password:hover {
+            background-color: #2e3d57;
+        }
+        #input-container {
+            display: flex;
+            align-items: center;
+        }
+        #user-input {
+            flex: 1;
+            padding: 10px;
+            background-color: #333333;
+            color: #e0e0e0;
+            border: 1px solid #555;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        #send-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #3a4a66;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        #send-button:hover {
+            background-color: #2e3d57;
+        }
+        #response-box {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #333;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #1b1b1b;
+            display: flex;
+            flex-direction: column;
+        }
+        .response-message {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 6px;
+            display: inline-block;
+            max-width: 70%;
+            word-wrap: break-word;
+            background-color: #3a4a66;
+            color: #e0f7fa;
+            align-self: flex-start;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div id="password-container">
+    <div id="password-header">Enter Password</div>
+    <input type="password" id="password-input" placeholder="Enter password..." />
+    <button id="submit-password">Submit</button>
+</div>
+
+<div id="humanizer-container" style="display: none;">
+    <div id="response-box">
+        <!-- AI responses will appear here -->
+    </div>
+    <div id="input-container">
+        <input type="text" id="user-input" placeholder="Type your message..." />
+        <button id="send-button">Send</button>
+    </div>
+</div>
+
+<script>
+    const correctPassword = "LOLNOTTHEPASSWORD"; // Change to your password
+    const passwordInput = document.getElementById('password-input');
+    const submitPasswordButton = document.getElementById('submit-password');
+    const passwordContainer = document.getElementById('password-container');
+    const humanizerContainer = document.getElementById('humanizer-container');
+    
+    submitPasswordButton.addEventListener('click', () => {
+        if (passwordInput.value === correctPassword) {
+            passwordContainer.style.display = 'none';
+            humanizerContainer.style.display = 'block';
+        } else {
+            alert("Incorrect password. Please try again.");
+        }
+    });
+
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+    const responseBox = document.getElementById('response-box');
+
+    // Function to display AI responses in the response box
+    function displayResponse(message) {
+        const responseElement = document.createElement('div');
+        responseElement.classList.add('response-message');
+        responseElement.textContent = message;
+        responseBox.appendChild(responseElement);
+        responseBox.scrollTop = responseBox.scrollHeight; // Auto scroll to bottom
+    }
+
+    // Function to fetch AI response from the API
+    async function fetchAIResponse(prompt) {
+        const url = `https://tilki.dev/api/hercai?soru=${encodeURIComponent(prompt)}`;
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.cevap;
+        } catch (error) {
+            console.error("Error fetching AI response:", error);
+            return "Sorry, there was an error getting the response.";
+        }
+    }
+
+    // Event listener for the Send button
+    sendButton.addEventListener('click', async () => {
+        const userMessage = userInput.value.trim();
+        if (!userMessage) return;
+        
+        // Clear input
+        userInput.value = '';
+
+        // Fetch and display AI response
+        const aiResponse = await fetchAIResponse(userMessage);
+        displayResponse(aiResponse);
+    });
+
+    // Allow Enter key to submit the message
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendButton.click();
+        }
+    });
+</script>
+
+</body>
+</html>
