@@ -27,7 +27,7 @@
             margin: 0 auto; /* Center the container */
         }
         #input-text {
-            width: 100%;
+            width: calc(100% - 20px); /* Center the textbox with padding */
             height: 100px; /* Adjusted height for the textarea */
             padding: 10px;
             background-color: #333333;
@@ -36,6 +36,7 @@
             border-radius: 4px;
             margin-bottom: 10px;
             resize: none; /* Disable resizing */
+            box-sizing: border-box; /* Include padding in width calculation */
         }
         #humanize-button {
             padding: 10px 20px;
