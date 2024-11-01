@@ -166,6 +166,7 @@
             passwordContainer.style.display = 'none';
             tabs.style.display = 'flex';
             chatContainer.style.display = 'block'; // Show chat container by default
+            showTab('chat'); // Show the chat tab content by default
         } else {
             alert("Incorrect password. Please try again.");
         }
@@ -174,9 +175,13 @@
     function showTab(tabName) {
         const tabs = document.querySelectorAll('.tab-content');
         const tabButtons = document.querySelectorAll('.tab');
-        tabs.forEach(tab => tab.classList.remove('active-content'));
+        tabs.forEach(tab => {
+            tab.style.display = 'none'; // Hide all tabs
+            tab.classList.remove('active-content');
+        });
         tabButtons.forEach(tab => tab.classList.remove('active'));
-        
+
+        document.getElementById(tabName + '-container').style.display = 'block'; // Show selected tab
         document.getElementById(tabName + '-container').classList.add('active-content');
         document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
     }
@@ -258,13 +263,18 @@
 
     // Auto submit and copy on paste
     inputTextArea.addEventListener('paste', (event) => {
+        event.preventDefault();
+        const pasteText = (event.clipboardData || window.clipboardData).getData('text');
+        inputTextArea.value = pasteText;
+
         setTimeout(() => {
-            const pastedText = inputTextArea.value.trim();
-            if (pastedText) {
-                const humanizedText = humanizeText(pastedText);
-                navigator.clipboard.writeText(humanizedText);
-                inputTextArea.value = '';
-            }
+            const humanizedText = humanizeText(inputTextArea.value);
+            navigator.clipboard.writeText(humanizedText).then(() => {
+                console.log("Text copied to clipboard:", humanizedText);
+            }).catch(err => {
+                console.error("Error copying text:", err);
+            });
+            inputTextArea.value = '';
         }, 0);
     });
 </script>
