@@ -27,12 +27,14 @@
         }
         #input-text {
             width: 100%;
+            height: 100px; /* Adjusted height for the textarea */
             padding: 10px;
             background-color: #333333;
             color: #e0e0e0;
             border: 1px solid #555;
             border-radius: 4px;
             margin-bottom: 10px;
+            resize: none; /* Disable resizing */
         }
         #humanize-button {
             padding: 10px 20px;
@@ -50,7 +52,7 @@
 <body>
 
 <div id="container">
-    <textarea id="input-text" rows="5" placeholder="Enter text to humanize..."></textarea>
+    <textarea id="input-text" placeholder="Enter text to humanize..."></textarea>
     <button id="humanize-button">Humanize</button>
 </div>
 
