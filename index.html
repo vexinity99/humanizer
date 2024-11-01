@@ -10,6 +10,7 @@
             background-color: #121212;
             color: #e0e0e0;
             text-align: center;
+            margin: 0; /* Remove default body margin for full-screen effect */
         }
         #tabs {
             display: flex;
@@ -38,8 +39,9 @@
             background-color: #1e1e1e;
             padding: 20px;
             border-radius: 8px;
-            max-width: 500px;
+            max-width: 100%; /* Allow the iframe to stretch */
             margin: 0 auto;
+            height: calc(100vh - 100px); /* Fullscreen height minus tabs */
         }
         .active-content {
             display: block;
@@ -123,6 +125,11 @@
         #send-button:hover, #humanize-button:hover {
             background-color: #2e3d57;
         }
+        #embed-container {
+            width: 100%;
+            height: 100%; /* Make the iframe take the full height of the container */
+            border: none; /* Remove default iframe border */
+        }
     </style>
 </head>
 <body>
@@ -135,6 +142,7 @@
 <div id="tabs" style="display: none;">
     <div class="tab active" onclick="showTab('chat')">AI Chat Interface</div>
     <div class="tab" onclick="showTab('humanizer')">Humanizer Tool</div>
+    <div class="tab" onclick="showTab('embed')">Embedded Website</div> <!-- New Tab -->
 </div>
 
 <div id="chat-container" class="tab-content active-content" style="display: none;">
@@ -152,6 +160,10 @@
     <button id="humanize-button">Humanize</button>
 </div>
 
+<div id="embed-container" class="tab-content" style="display: none;">
+    <iframe id="embed-frame" src="https://sd592g.github.io/zj684od4lfg/" class="embed-container"></iframe>
+</div>
+
 <script>
     const correctPassword = "hi";
     const passwordInput = document.getElementById('password-input');
@@ -160,6 +172,7 @@
     const tabs = document.getElementById('tabs');
     const chatContainer = document.getElementById('chat-container');
     const humanizerContainer = document.getElementById('humanizer-container');
+    const embedContainer = document.getElementById('embed-container');
 
     submitPasswordButton.addEventListener('click', () => {
         if (passwordInput.value === correctPassword) {
@@ -239,29 +252,25 @@
     function humanizeText(text) {
         const zeroWidthSpace = '\u200B';
         const inflatedText = text.split('').join(zeroWidthSpace);
-        const lowerCaseText = inflatedText.toLowerCase();
-        return lowerCaseText.replace(/[,;]/g, '');
+        const lowerCaseText = inflatedText.toLowerCase().replace(/[,;]/g, '');
+        return lowerCaseText;
     }
 
+    // Event listener for the Humanize button
     const humanizeButton = document.getElementById('humanize-button');
     const inputTextArea = document.getElementById('input-text');
 
-    // Event listener for the Humanize button
     humanizeButton.addEventListener('click', () => {
-        const inputText = inputTextArea.value.trim();
-        if (!inputText) return;
-
-        const humanizedText = humanizeText(inputText);
+        const humanizedText = humanizeText(inputTextArea.value);
         navigator.clipboard.writeText(humanizedText).then(() => {
             console.log("Text copied to clipboard:", humanizedText);
         }).catch(err => {
             console.error("Error copying text:", err);
         });
-
         inputTextArea.value = '';
     });
 
-    // Auto submit and copy on paste
+    // Handle paste event in the humanizer input area
     inputTextArea.addEventListener('paste', (event) => {
         event.preventDefault();
         const pasteText = (event.clipboardData || window.clipboardData).getData('text');
